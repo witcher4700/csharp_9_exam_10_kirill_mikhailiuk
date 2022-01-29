@@ -17,9 +17,6 @@
 <body>
     <div class="container">
         <h3>Список мест</h3>
-        @if (User.Identity.IsAuthenticated)
-        {
-<a asp-action="Add" class="btn-primary btn" asp-controller="Place">Добавить место</a>}
         <div class="row row-cols-1 row-cols-md-3"> 
             @foreach (var v in Model)
             {

@@ -1,4 +1,6 @@
-﻿namespace ControlWork10.Entyties
+﻿using System;
+
+namespace ControlWork10.Entyties
 {
     public class Review
     {
@@ -7,5 +9,6 @@
         public double Rating { get; set; }
         public string TextReview { get; set; }
         public int PlaceId { get; set; }
+        public DateTime DateTime { get; set; }
     }
 }

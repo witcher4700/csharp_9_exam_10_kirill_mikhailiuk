@@ -55,7 +55,7 @@ namespace ControlWork10.Controllers
             var details = new DetailsViewModel()
             {
                 Place = _context.Places.FirstOrDefault(p => p.Id == id),
-                Reviews = _context.Reviews.Where(r=>r.PlaceId == id).ToList()
+                Reviews = _context.Reviews.Where(r=>r.PlaceId == id).OrderByDescending(r=>r.DateTime).ToList()
             };
             details.Place.AverageRating = Math.Round(details.Place.AverageRating, 1);
 
@@ -75,7 +75,8 @@ namespace ControlWork10.Controllers
                     UserName = User.Identity.Name,
                     PlaceId = placeId,
                     Rating = rating,
-                    TextReview = text
+                    TextReview = text,
+                    DateTime = DateTime.Now
                 };
                 _context.Places.FirstOrDefault(p => p.Id == placeId).ReviewsCount += 1;
                 _context.Reviews.Add(review);
@@ -121,6 +122,14 @@ namespace ControlWork10.Controllers
             }
             rating /= reviews.Count;
             return rating;
+        }
+        public IActionResult Search(string query)
+        {
+            var resultPlaces = _context.Places
+                 .Where(t =>
+                     t.Description.Contains(query) ||
+                     t.Name.Contains(query)).ToList();
+            return View(resultPlaces);
         }
     }
 }

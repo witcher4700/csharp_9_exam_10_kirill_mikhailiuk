@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Palce Critic";
+}
+@using ControlWork10.Entyties
+@model List<Place>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>text-align</title>
+    <style>
+    </style>
+</head>
+<body>
+    <div class="container text-center">
+        @foreach (var u in Model)
+        {
+            <div class="align-items-center d-flex justify-content-center">
+                <a asp-action="Details" class="mx-2" asp-controller="Place" asp-route-id="@u.Id"><span class="align-text-top mb-2 text-dark"><strong>@u.Name</strong></span></a>
+            </div>
+        }
+    </div>
+</body>
+</html>
