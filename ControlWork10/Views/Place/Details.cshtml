@@ -1,0 +1,239 @@
+﻿@model ControlWork10.ViewModels.DetailsViewModel
+
+
+@{ ViewData["Title"] = Model.Place.Name; }
+
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>text-align</title>
+    <style>
+
+        .container {
+            width: 100%;
+            text-align: center
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            padding-top: 100px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close {
+            color: #aaaaaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+            .close:hover,
+            .close:focus {
+                color: #000;
+                text-decoration: none;
+                cursor: pointer;
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card text-left">
+            <div class="card-header">
+                <p class="card-text font-weight-bold"><span class="font-weight-bold">Название места : @Model.Place.Name</span></p>
+                <p class="card-text font-weight-bold"><span class="font-weight-bold">Описание места : @Model.Place.Description</span></p>
+            </div>
+            <img src=@Model.Place.MainPhoto class="card-img-top" alt="..." style="height:auto; width:auto">
+            <div class="card-body">
+                <p>Оценка места: @Model.Place.AverageRating </p>
+                <p id="likeCount">@Model.Place.ReviewsCount отзывов</p>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <a class="btn-primary btn" id="addReview">Добавить отзыв</a>}
+                <a class="btn-primary btn" id="showPhoto">Посмотреть все фото</a>
+                <hr class="font-weight-bold">
+                @foreach (var c in Model.Reviews)
+                {
+                    <p class="card-text "><span class="font-weight-bold">Оценка: @c.Rating</span></p>
+                    <p class="card-text "><span class="font-weight-bold">@c.UserName:</span> @c.TextReview</p>
+                    <hr class="font-weight-bold">}
+            </div>
+        </div>
+    </div>
+    <div id="myModal" class="modal">
+
+        <div class="modal-content">
+            <form method="post">
+                <span class="close">&times;</span>
+                <Label>Текст отзыва</Label>
+                <input type="text" value="" id="reviewText" required />
+                <Label>Выберите оценку</Label>
+                <select class="form-select" id="grade" aria-label="Default select example">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option selected value="5">5</option>
+                </select>
+                <a id="saveReview" class="btn btn-primary">Добавить отзыв</a>
+            </form>
+
+
+        </div>
+    </div>
+    <div id="newModal" class="modal">
+
+        <div class="modal-content">
+            <form method="post">
+                <span class="close" id="closeDeleteModal">&times;</span>
+                <p>Вы уже добавляли отзыв к этому месту, хотите удалить предыдущий отзыв?</p>
+                <a id="deleteReview" class="btn btn-primary">Удалить отзыв</a>
+            </form>
+
+
+        </div>
+    </div>
+    <div id="showPhotoModal" class="modal">
+
+        <div class="modal-content">
+            <form method="post">
+                <span class="close" id="closePhotoModal">&times;</span>
+                @if (Model.Photos == null || Model.Photos.Count == 0)
+                {
+                    <p>Пользователь, создавший это место еще не добавил фотографий</p>
+                }
+                else
+                {
+                    foreach (var item in Model.Photos)
+                    {
+                        <img src=@item.Link alt="..." style="height:auto; width:auto">
+                    }
+                }
+                @if (User.Identity.Name == Model.Place.User.UserName)
+                {
+            <Label>Ссылка на картинку</Label>
+                    <input type="text" value="" id="photoLink" required />
+                    <a id="addPhotoBtn" class="btn btn-primary">Добавить фото</a>}
+
+            </form>
+
+
+        </div>
+    </div>
+    @section scripts{
+        @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+
+<script>
+    $("#showPhoto").on('click', () => {
+        $("#showPhotoModal").show()
+    });
+            $("#addPhotoBtn").on('click', () => {
+                if ($("#photoLink").val().length == 0){
+                        return alert("Заполните все поля формы!")
+                    }
+                $.post('@Url.Action("AddPhoto", "Place")',
+                    {
+                        placeId: '@Model.Place.Id',
+                        link: $("#photoLink").val()
+                    },
+                    function (response) {
+                        console.log(response)
+                        if (response == 200) {
+                            alert("Обновите страницу, чтобы увидеть новые фотографии")
+                            $("#showPhotoModal").hide()
+                        }
+                    }
+                )
+                });
+            var deleteModal = document.getElementById("newModal")
+            $("#myModal").hide()
+                $('#saveReview').on('click', () => {
+                    if ($("#reviewText").val().length == 0){
+                        return alert("Заполните все поля формы!")
+                    }
+                $.post('@Url.Action("AddReview", "Place")',
+                    {
+                        placeId: '@Model.Place.Id',
+                        rating: $('#grade').val(),
+                        text: $('#reviewText').val()
+                    },
+                    function (response) {
+                        console.log(response)
+                        if (response == 200) {
+                            alert("Обновите страницу, чтобы увидеть новые отзывы")
+                        }
+                        else {
+                            $("#newModal").show()
+                        }
+                    }
+                )
+                });
+            $('#deleteReview').on('click', () => {
+                $("#myModal").hide()
+                $.post('@Url.Action("DeleteReview", "Place")',
+                    {
+                        placeId: '@Model.Place.Id',
+                    },
+                    function (response) {
+                        console.log(response)
+                        if (response == 200) {
+                            $("#newModal").hide()
+                            alert("Ваш отзыв успешно удалён. Обновите страницу, чтобы увидеть новые отзывы")
+                        }
+                    }
+                )
+            });
+            var modal = document.getElementById("myModal");
+
+            var btn = document.getElementById("addReview");
+
+                var span = document.getElementsByClassName("close")[0];
+
+                btn.onclick = function () {
+                    modal.style.display = "block";
+                }
+
+                span.onclick = function () {
+                    modal.style.display = "none";
+                }
+
+    $("#closeDeleteModal").on('click',  () => {
+        $("#newModal").hide()
+    })
+
+    $("#closePhotoModal").on('click',  () => {
+        $("#showPhotoModal").hide()
+    })
+
+                window.onclick = function (event) {
+                    if (event.target == modal) {
+                        modal.style.display = "none";
+                    }
+                    else if (event.target == $("#newModal")){
+                        $("#newModal").hide()
+                    }
+                    else if (event.target == $("#showPhotoModal")) {
+                        $("#showPhotoModal").hide()
+                    }
+                }
+</script>
+    }
+</body>
+
+</html>

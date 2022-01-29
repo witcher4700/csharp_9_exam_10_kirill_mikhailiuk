@@ -1,0 +1,59 @@
+﻿@using ControlWork10.Entyties
+@model Place
+
+
+@{ ViewBag.Title = "Добавить место";
+
+    Layout = "_Layout"; }
+
+
+<h2>Заполните форму для добавления нового места</h2>
+
+<div class="row">
+
+    <div class="phone_add_form col-md-6">
+
+        <form asp-action="Add" method="post">
+
+            <div class="form_row">
+
+                <label for="">
+
+                    Название
+
+                    <input asp-for="Name" type="text" placeholder="Введите" required="required">
+
+                </label>
+
+            </div>
+            <div class="form_row">
+
+                <label for="">
+
+                    Фотка
+
+                    <input asp-for="MainPhoto" type="text" placeholder="Введите" required="required">
+
+                </label>
+
+            </div>
+
+            <div class="form_row">
+
+                <label for="">
+
+                    Описание места
+
+                </label>
+                @Html.TextAreaFor(m => m.Description)
+            </div>
+
+            <button type="submit">Создать</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+

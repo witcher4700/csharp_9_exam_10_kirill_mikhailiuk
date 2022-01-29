@@ -1,0 +1,87 @@
+﻿@model ControlWork10.ViewModels.RegisterViewModel
+
+
+
+<h2>Регистрация нового пользователя</h2>
+
+<form method="post" asp-controller="Account" asp-action="Register">
+
+    <div asp-validation-summary="ModelOnly"></div>
+
+    <div>
+
+        <label asp-for="Email"></label><br />
+
+        <input asp-for="Email" id="email" />
+
+        <span asp-validation-for="Email"></span>
+
+    </div>
+    <div>
+
+        <label asp-for="UserName"></label><br />
+
+        <input asp-for="UserName" id="name" />
+
+        <span asp-validation-for="UserName"></span>
+
+    </div>
+
+    <div>
+
+        <label asp-for="Password"></label><br />
+
+        <input asp-for="Password" id="pwd"/>
+
+        <span asp-validation-for="Password"></span>
+
+    </div>
+
+    <div>
+
+        <label asp-for="PasswordConfirm"></label><br />
+
+        <input asp-for="PasswordConfirm" id="pwdConfirm"/>
+
+        <span asp-validation-for="PasswordConfirm"></span>
+
+    </div>
+
+    <div>
+
+        <input type="submit" id="sumbitBtn" value="Регистрация" />
+        <a id="checkBtn" class="btn btn-danger">Проверить данные</a>
+    </div>
+
+</form>
+@section scripts{
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+    <script>
+        $(function () {
+            $(':input[type="submit"]').prop('disabled', true);
+        });
+
+        $("#checkBtn").on('click', () => {
+            if ($("#name").val().length == 0 || $("#email").val().length == 0){
+                        return alert("Заполните все поля формы!")
+                    }
+                $.post('@Url.Action("CheckData", "Account")',
+                    {
+                        name: $('#name').val(),
+                        email: $('#email').val()
+                    },
+                    function (response) {
+                        if (response === 200) {
+                            swal("Успех!", "Имя пользователя и Email успешно прошли проверку", "success");
+                            $(':input[type="submit"]').prop('disabled', false);
+                        } else {
+                            swal("Ой!", response, "info");
+                        }
+                    }
+                )
+                });
+    </script>
+}

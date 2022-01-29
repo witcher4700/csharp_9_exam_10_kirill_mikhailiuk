@@ -1,0 +1,42 @@
+﻿@{ ViewData["Title"] = "Home Page"; }
+@using ControlWork10.Entyties
+@model List<Place>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>text-align</title>
+    <style>
+
+
+        .container {
+            width: 100%;
+            text-align: center
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h3>Список мест</h3>
+        @if (User.Identity.IsAuthenticated)
+        {
+<a asp-action="Add" class="btn-primary btn" asp-controller="Place">Добавить место</a>}
+        <div class="row row-cols-1 row-cols-md-3"> 
+            @foreach (var v in Model)
+            {
+
+<div class="col mb-4">
+    <div class="card" style="width: 18rem;">
+        <img src="@v.MainPhoto" class="card-img-top" alt="...">
+        <div class="card-body">
+            <h5 class="card-title">Название: @v.Name</h5>
+            <h5 class="card-title">Оценка: @v.AverageRating</h5>
+            <p class="card-title">Количество фото: @v.PhotoCount</p>
+            <hp5 class="card-title">Количество отзывов: @v.ReviewsCount</hp5>
+            <a asp-action="Details" asp-controller="Place" asp-route-id="@v.Id">Подробнее</a>
+        </div>
+    </div>
+</div>}
+        </div>
+    </div>
+</body>
+</html>
